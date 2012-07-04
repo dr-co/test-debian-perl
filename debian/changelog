@@ -1,0 +1,5 @@
+libtest-debian-perl (0.01-1) unstable; urgency=low
+
+  * Debian first commit, closes: #680178
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 04 Jul 2012 13:54:53 +0400
