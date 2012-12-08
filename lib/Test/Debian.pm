@@ -13,7 +13,7 @@ our @EXPORT = qw(
     package_isnt_installed
 );
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub system_is_debian(;$) {
     my $name = shift || 'System is debian';
@@ -61,7 +61,7 @@ sub package_is_installed($;$) {
     }
 
 
-    return $tb->ok( 1, $name );
+    return $tb->ok( 0, $name );
 }
 
 
