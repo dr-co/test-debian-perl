@@ -13,7 +13,7 @@ our @EXPORT = qw(
     package_isnt_installed
 );
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub system_is_debian(;$) {
     my $name = shift || 'System is debian';
@@ -50,12 +50,18 @@ sub package_is_installed($;$) {
     my ($pkg, $name) = @_;
 
     $name ||= "$pkg is installed";
-
-    my $list = _pkg_list($name) or return 0;
+    my $list = _pkg_list($_) or return 0;
 
     my $tb = Test::More->builder;
-    return $tb->ok( 0, $name ) unless exists $list->{ $pkg };
-    return $tb->cmp_ok($list->{ $pkg }, 'eq', 'install', $name);
+    my @names = split /\|/, $pkg;
+    for (@names) {
+        next unless exists $list->{ $_ };
+        next unless $list->{ $_ } eq 'install';
+        return $tb->ok( 1, $name );
+    }
+
+
+    return $tb->ok( 1, $name );
 }
 
 
