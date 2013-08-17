@@ -12,8 +12,9 @@ WriteMakefile(
     LICENSE           => 'perl',
     META_MERGE => {
         resources => {
-            homepage    => 'https://github.com/unera/test-debian-perl',
-            bugtracker  => 'https://github.com/unera/test-debian-perl/issues'
+            homepage    => 'https://github.com/dr-co/test-debian-perl',
+            repository  => 'https://github.com/dr-co/test-debian-perl',
+            bugtracker  => 'https://github.com/dr-co/test-debian-perl/issues'
         }
     }
 );
