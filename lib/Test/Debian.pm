@@ -13,7 +13,7 @@ our @EXPORT = qw(
     package_isnt_installed
 );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my $DPKG = '/usr/bin/dpkg';
 
@@ -158,33 +158,6 @@ sub _compare_versions {
     return $r;
 }
 
-#sub _run_dpkg {
-#    my ($out, @opts) = @_;
-#
-#    pipe my $r, my $w or die "pipe: $!";
-#    my $pid = fork;
-#    unless ($pid) {
-#        die "fork: $!" unless defined $pid;
-#
-#        $r->close;
-#        $w->autoflush;
-#        open STDOUT, '>&', $w or die "dup: $!";
-#        open STDERR, '>&', \*STDOUT or die "dub: $!";
-#        exec {$DPKG} $DPKG, @opts;
-#        die "exec: $!";
-#    }
-#
-#    $w->close;
-#    while (<$r>) {
-#        push @$out, $_ if $out;
-#    }
-#
-#    waitpid $pid, 0;
-#    TODO
-#
-#    return $? ? $? >> 8 : 0;
-#}
-#
 
 1;
 
