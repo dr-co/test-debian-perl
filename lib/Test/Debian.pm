@@ -13,7 +13,7 @@ our @EXPORT = qw(
     package_isnt_installed
 );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 my $DPKG = '/usr/bin/dpkg';
 

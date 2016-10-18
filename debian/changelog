@@ -1,4 +1,4 @@
-libtest-debian-perl (0.05-1) unstable; urgency=medium
+libtest-debian-perl (0.06-1) unstable; urgency=medium
 
   * Extends package test syntax.
 
