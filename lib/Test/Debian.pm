@@ -182,7 +182,7 @@ The module provides some perl tests for debian system:
 
 Passes if current OS is debian
 
-=head2 package_is_installed($pkg_name [, $test_name ])
+=head2 package_is_installed($pkg_variant [, $test_name ])
 
 Passes if package is installed
 
