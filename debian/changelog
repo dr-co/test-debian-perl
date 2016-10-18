@@ -1,3 +1,9 @@
+libtest-debian-perl (0.05-1) unstable; urgency=medium
+
+  * Extends package test syntax.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 18 Oct 2016 17:20:08 +0300
+
 libtest-debian-perl (0.03-1) unstable; urgency=low
 
   * Fix ok error.

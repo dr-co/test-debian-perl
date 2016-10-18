@@ -11,7 +11,7 @@ BEGIN {
 
     plan skip_all => 'Current system is not Debian'
         unless -r '/etc/debian_version';
-    plan tests    => 15;
+    plan tests    => 16;
 
     use_ok 'Test::Debian';
 }
@@ -27,6 +27,7 @@ package_is_installed 'dddddddddddddddd | dpkg | abcccc';
 (my $prev = $perl) =~ s/(\d\d)/$1 - 1/e;
 (my $next = $perl) =~ s/(\d\d)/$1 + 1/e;
 
+package_is_installed "perl (< $perl) | perl"; 
 package_is_installed "perl ( =  $perl )"; 
 package_is_installed "perl ( >= $perl )"; 
 package_is_installed "perl ( <= $perl )"; 

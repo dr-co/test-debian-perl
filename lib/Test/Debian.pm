@@ -13,7 +13,7 @@ our @EXPORT = qw(
     package_isnt_installed
 );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 my $DPKG = '/usr/bin/dpkg';
 
@@ -55,20 +55,18 @@ sub package_is_installed($;$) {
 
     my $tb = Test::More->builder;
 
-    for ( split /\|/, $pkgs ) {
+    $name ||= "package(s) '$pkgs' is/are installed";
+
+    for ( split /\s*\|\s*/, $pkgs ) {
         my ($pkg, $op, $ver) = _parse_pkg($_);
         next unless $pkg;
 
         next unless exists $list->{ $pkg };
         next unless $list->{ $pkg } eq 'install';
 
-        $name ||= "$pkg is installed";
-
         return $tb->ok( 1, $name ) unless $op;
-
-        my $res = _compare_versions($pkg, $op, $ver);
-
-        return $tb->ok( defined $res && $res eq '0' ? 1 : 0, $name);
+        my $ok = _compare_versions_ok($pkg, $op, $ver);
+        return $tb->ok(1, $name) if $ok;
     }
 
     return $tb->ok( 0, $name );
@@ -124,7 +122,7 @@ sub _parse_pkg {
     return ($pkg, $op, $ver);
 }
 
-sub _compare_versions {
+sub _compare_versions_ok {
     my ($pkg, $op, $req_ver) = @_;
 
     my $pid = open my $fh, '-|', $DPKG, '-s', $pkg;
@@ -154,8 +152,7 @@ sub _compare_versions {
         diag "dpkg error: $r";
         return undef;
     }
-
-    return $r;
+    return $r == 0;
 }
 
 
@@ -188,6 +185,11 @@ Passes if current OS is debian
 =head2 package_is_installed($pkg_name [, $test_name ])
 
 Passes if package is installed
+
+L<package_is_installed> understands the following syntax:
+
+    package1 | package2
+    package1 (< 1.23) | package2 (> 1.3)
 
 
 =head2 package_isnt_installed($pkg_name [, $test_name ])
