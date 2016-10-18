@@ -13,7 +13,9 @@ our @EXPORT = qw(
     package_isnt_installed
 );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
+
+my $DPKG = '/usr/bin/dpkg';
 
 sub system_is_debian(;$) {
     my $name = shift || 'System is debian';
@@ -25,9 +27,9 @@ sub _pkg_list($) {
     my ($name) = @_;
     our %dpkg_list;
 
-    unless(-x '/usr/bin/dpkg') {
+    unless(-x $DPKG) {
         Test::More->builder->ok( 0, $name );
-        diag '/usr/bin/dpkg is not found or executable';
+        diag "$DPKG not found or executable";
         return 0;
     }
     unless(%dpkg_list) {
@@ -47,34 +49,113 @@ sub _pkg_list($) {
 }
 
 sub package_is_installed($;$) {
-    my ($pkg, $name) = @_;
-
-    $name ||= "$pkg is installed";
-    my $list = _pkg_list($_) or return 0;
-
-    my $tb = Test::More->builder;
-    my @names = split /\|/, $pkg;
-    for (@names) {
-        next unless exists $list->{ $_ };
-        next unless $list->{ $_ } eq 'install';
-        return $tb->ok( 1, $name );
-    }
-
-
-    return $tb->ok( 0, $name );
-}
-
-
-sub package_isnt_installed($;$) {
-    my ($pkg, $name) = @_;
-
-    $name ||= "$pkg is not installed";
+    my ($pkgs, $name) = @_;
 
     my $list = _pkg_list($name) or return 0;
 
     my $tb = Test::More->builder;
+
+    for ( split /\|/, $pkgs ) {
+        my ($pkg, $op, $ver) = _parse_pkg($_);
+        next unless $pkg;
+
+        next unless exists $list->{ $pkg };
+        next unless $list->{ $pkg } eq 'install';
+
+        $name ||= "$pkg is installed";
+
+        return $tb->ok( 1, $name ) unless $op;
+
+        my $res = _compare_versions($pkg, $op, $ver);
+
+        return $tb->ok( defined $res && $res eq '0' ? 1 : 0, $name);
+    }
+
+    return $tb->ok( 0, $name );
+}
+
+sub package_isnt_installed($;$) {
+    my ($pkg_spec, $name) = @_;
+
+    $name ||= "$pkg_spec is not installed";
+
+    my $list = _pkg_list($name) or return 0;
+
+    my $tb = Test::More->builder;
+    my ($pkg, $op, $ver) = _parse_pkg($pkg_spec);
+    return $tb->ok( 0, $name) unless $pkg;
+
     return $tb->ok( 1, $name ) unless exists $list->{ $pkg };
-    return $tb->cmp_ok($list->{ $pkg }, 'ne', 'install', $name);
+    return $tb->cmp_ok($list->{ $pkg }, 'ne', 'install', $name) unless $op;
+
+    my $res = _compare_versions($pkg, $op, $ver);
+
+    return $tb->ok( $res ? 1 : 0, $name);
+}
+
+
+my %ops = (
+    '>'  => 'gt',
+    '>=' => 'ge',
+    '='  => 'eq',
+    '!=' => 'ne',
+    '<'  => 'lt',
+    '<=' => 'le',
+);
+
+sub _parse_pkg {
+    my ($str) = @_;
+    $str =~ s/\s+//g;
+    my ($pkg, $op, $ver) = $str =~ /^([^(]+) (?:\( ([^\d]+) ([^)]+) \))?$/x;
+
+    my $err;
+    if ($op) {
+        $op = $ops{$op};
+        $err = 1 unless $op && $ver =~ /^[\d._-]+/;
+    }
+    else {
+        $err = 1 unless $pkg && length $str == length $pkg;
+    }
+    if ($err) {
+        diag "invalid syntax for package '$_[0]'";
+        return;
+    }
+
+    return ($pkg, $op, $ver);
+}
+
+sub _compare_versions {
+    my ($pkg, $op, $req_ver) = @_;
+
+    my $pid = open my $fh, '-|', $DPKG, '-s', $pkg;
+    unless ($pid) {
+        diag "exec: $!";
+        return undef;
+    }
+    my @info = <$fh>;
+    waitpid $pid, 0;
+    if ($?) {
+        diag "$DPKG error: ", $? >> 8;
+        return undef;
+    }
+    my $inst_ver;
+    for (@info) {
+        $inst_ver = $1 and last if /^Version:\s+(.+)$/;
+    }
+    unless ($inst_ver) {
+        diag "Can`t define version $pkg";
+        return undef;
+    }
+    $inst_ver =~ s/(^[\d.]+).+$/$1/;
+
+    my $r = system($DPKG, '--compare-versions', $inst_ver, $op, $req_ver);
+    $r = $r >> 8;
+    if ($r > 1) {
+        diag "dpkg error: $r";
+        return undef;
+    }
+
+    return $r;
 }
 
 
