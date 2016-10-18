@@ -4,11 +4,7 @@ services:
   - docker
 
 env:
-  matrix:
-    - TRAVIS_DEBIAN_DISTRIBUTION=wheezy DPUT=1 TRAVIS_DEBIAN_GIT_ON_BUILDPACKAGE="git submodule update --init && fakeroot debian/rules clean tarball"
-    - TRAVIS_DEBIAN_DISTRIBUTION=jessie DPUT=1
-    - TRAVIS_DEBIAN_DISTRIBUTION=sid DPUT=0
-
+  - TRAVIS_DEBIAN_DISTRIBUTION=wheezy
 
 before_install:
   - set -e
