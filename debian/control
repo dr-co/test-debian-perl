@@ -3,7 +3,7 @@ Section: perl
 Homepage: http://search.cpan.org/dist/Test-Debian/
 Maintainer: Dmitry E. Oboukhov <unera@debian.org>
 Build-Depends: debhelper (>= 7), cdbs
-Standards-Version: 3.9.3
+Standards-Version: 3.9.6
 Priority: extra
 VCS-Browser: https://github.com/unera/test-debian-perl
 
