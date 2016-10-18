@@ -30,7 +30,8 @@ script:
   - echo '     IdentityFile=../issh'  >> ../dput.cf
 
   - if test "$DPUT" -eq 1; then dput --debug -u -c ../dput.cf nowtaxi ../*.changes; fi
-  
+ 
+  - ls -l ../*.changes
   - cat ../*.changes
 
 branches:
