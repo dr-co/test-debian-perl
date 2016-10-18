@@ -20,34 +20,16 @@ script:
   - echo $UPLOAD_SSH_KEY | base64 -d > ../issh
   - chmod 0600 ../issh
 
-  - echo '[nowtaxi-jessie]' > ../dput.cf
+  - echo '[nowtaxi]' > ../dput.cf
   - echo login = gitlabuploader >> ../dput.cf
   - echo fqdn = debian.nowtaxi.ru >> ../dput.cf
   - echo method = scp >> ../dput.cf
-  - echo incoming = /srv/debian.incomming/jessie >> ../dput.cf
+  - echo incoming = /srv/debian.incomming >> ../dput.cf
   - echo ssh_config_options = UserKnownHostsFile=/dev/null >> ../dput.cf
   - echo '     StrictHostKeyChecking=no' >> ../dput.cf
   - echo '     IdentityFile=../issh'  >> ../dput.cf
 
-  - echo '[nowtaxi-wheezy]' >> ../dput.cf
-  - echo login = gitlabuploader >> ../dput.cf
-  - echo fqdn = debian.nowtaxi.ru >> ../dput.cf
-  - echo method = scp >> ../dput.cf
-  - echo incoming = /srv/debian.incomming/wheezy >> ../dput.cf
-  - echo ssh_config_options = UserKnownHostsFile=/dev/null >> ../dput.cf
-  - echo '     StrictHostKeyChecking=no' >> ../dput.cf
-  - echo '     IdentityFile=../issh'  >> ../dput.cf
-
-  - echo '[nowtaxi-stretch]' >> ../dput.cf
-  - echo login = gitlabuploader >> ../dput.cf
-  - echo fqdn = debian.nowtaxi.ru >> ../dput.cf
-  - echo method = scp >> ../dput.cf
-  - echo incoming = /srv/debian.incomming/stretch >> ../dput.cf
-  - echo ssh_config_options = UserKnownHostsFile=/dev/null >> ../dput.cf
-  - echo '     StrictHostKeyChecking=no' >> ../dput.cf
-  - echo '     IdentityFile=../issh'  >> ../dput.cf
-
-  - if test "$DPUT" -eq 1; then dput --debug -u -c ../dput.cf nowtaxi-$TRAVIS_DEBIAN_DISTRIBUTION ../*.changes; fi
+  - if test "$DPUT" -eq 1; then dput --debug -u -c ../dput.cf nowtaxi ../*.changes; fi
   
   - cat ../*.changes
 
