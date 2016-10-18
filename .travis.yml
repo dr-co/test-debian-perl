@@ -4,8 +4,7 @@ services:
   - docker
 
 env:
-  - TRAVIS_DEBIAN_DISTRIBUTION=wheezy
-  - DPUT=1
+  - TRAVIS_DEBIAN_DISTRIBUTION=wheezy DPUT=1
 
 before_install:
   - set -e
