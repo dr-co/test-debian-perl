@@ -23,18 +23,26 @@ package_isnt_installed('unknown_package_name');
 package_is_installed 'dpkg | abcccc';
 package_is_installed 'dddddddddddddddd | dpkg | abcccc';
 
-(my $perl = $^V) =~ s/^v//;
-(my $prev = $perl) =~ s/(\d\d)/$1 - 1/e;
-(my $next = $perl) =~ s/(\d\d)/$1 + 1/e;
+my $prog = 'dpkg';
+my $curr;
+for (`$prog -s dpkg`) {
+    $curr = $1 and last if /^\s*Version:\s+(.+)/; 
+}
+die "strange, can not determine `dpkg` version" unless $curr;
+$curr =~ s/\S\K[a-zA-Z].+$//;
+(my $prev = $curr) =~ s/([1-8])/$1 - 1/e;
+(my $next = $curr) =~ s/([1-8])/$1 + 1/e;
 
-package_is_installed "perl (< $perl) | perl"; 
-package_is_installed "perl ( =  $perl )"; 
-package_is_installed "perl ( >= $perl )"; 
-package_is_installed "perl ( <= $perl )"; 
-package_is_installed "perl ( != $prev )"; 
-package_is_installed "perl ( != $next )"; 
-package_is_installed "perl ( >  $prev )"; 
-package_is_installed "perl ( <  $next )"; 
-package_is_installed "perl ( <  $next )|perl (= $perl)"; 
-package_is_installed "perl ( >  $prev )|perl"; 
+note "Test on dpkg versions:\ncurrent $curr\nprevious $prev\nnext $next";
+
+package_is_installed "$prog (< $curr) | $prog"; 
+package_is_installed "$prog ( =  $curr )"; 
+package_is_installed "$prog ( >= $curr )"; 
+package_is_installed "$prog ( <= $curr )"; 
+package_is_installed "$prog ( != $prev )"; 
+package_is_installed "$prog ( != $next )"; 
+package_is_installed "$prog ( >  $prev )"; 
+package_is_installed "$prog ( <  $next )"; 
+package_is_installed "$prog ( <  $next )|$prog (= $curr)"; 
+package_is_installed "$prog ( >  $prev )|$prog"; 
 
