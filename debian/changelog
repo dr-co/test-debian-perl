@@ -1,3 +1,9 @@
+libtest-debian-perl (0.08-1) unstable; urgency=medium
+
+  * Bump version (conflict with travis-ci and debian buildd).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 14 Nov 2016 15:24:14 +0300
+
 libtest-debian-perl (0.07-1) unstable; urgency=medium
 
   * Tests are passed if use non-debian perl in debian system.
