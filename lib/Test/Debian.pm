@@ -13,7 +13,7 @@ our @EXPORT = qw(
     package_isnt_installed
 );
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 my $DPKG = '/usr/bin/dpkg';
 
@@ -48,11 +48,8 @@ sub _pkg_list($) {
     return \%dpkg_list;
 }
 
-sub package_is_installed($;@) {
-    my ($pkgs, $name, $adapt) = @_;
-    if (@_ >= 2) {
-        ($name, $adapt) = ($adapt, $name) if ref $name eq 'CODE';
-    }
+sub package_is_installed($;$) {
+    my ($pkgs, $name) = @_;
 
     my $list = _pkg_list($name) or return 0;
 
@@ -68,7 +65,7 @@ sub package_is_installed($;@) {
         next unless $list->{ $pkg } eq 'install';
 
         return $tb->ok( 1, $name ) unless $op;
-        my $ok = _compare_versions_ok($pkg, $op, $ver, $adapt);
+        my $ok = _compare_versions_ok($pkg, $op, $ver);
         return $tb->ok(1, $name) if $ok;
     }
 
@@ -126,7 +123,7 @@ sub _parse_pkg {
 }
 
 sub _compare_versions_ok {
-    my ($pkg, $op, $req_ver, $adapt) = @_;
+    my ($pkg, $op, $req_ver) = @_;
 
     my $pid = open my $fh, '-|', $DPKG, '-s', $pkg;
     unless ($pid) {
@@ -141,15 +138,15 @@ sub _compare_versions_ok {
     }
     my $inst_ver;
     for (@info) {
-        $inst_ver = $1 and last if /^Version:\s+(.+)$/;
+        if (/^Version:\s*(.+)\s*$/) {
+            $inst_ver = $1;
+            last;
+        }
     }
     unless ($inst_ver) {
         diag "Can`t define version $pkg";
         return undef;
     }
-
-    $inst_ver = $adapt ? $adapt->($inst_ver, $req_ver) 
-                       : _adapt_version($inst_ver, $req_ver);
 
     my $r = system($DPKG, '--compare-versions', $inst_ver, $op, $req_ver);
     $r = $r >> 8;
@@ -158,48 +155,6 @@ sub _compare_versions_ok {
         return undef;
     }
     return $r == 0;
-}
-
-=head2 Adoptation to compare
-
-https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version
-
-[epoch:]upstream_version[-debian_revision]
-
-                          user input       system format  
-  perl                    5.18.2       =   5.18.2-2ubuntu1.1
-  libapache2-mod-perl2    2.0.8        =   2.0.8+httpd24-r1449661-6ubuntu2
-  pciutils                3.2.1        =   1:3.2.1-1ubuntu5.1
-
-=cut
-
-sub _adapt_version {
-    my ($inst_ver, $req_ver) = @_;
-
-    # epoche
-    unless ($req_ver =~ /^\d+:/) {
-        $inst_ver =~ s/^\d+://;
-    }
-
-    # simple user version format, 1.2.3, 4.5z
-    if ($req_ver =~ /^(?:\d+:)?[\d.]+$/) {
-        $inst_ver =~ s/^(?:\d+:)?[\d.]+\K.+//;
-        return $inst_ver;
-    }
-    elsif ($req_ver =~ /^(?:\d+:)?[\d.]+[a-zA-Z]+$/) {
-        $inst_ver =~ s/^(?:\d+:)?[\d.]+[a-zA-Z]+\K.+//;
-        return $inst_ver;
-    }
-
-    # non simple version given. remove debian_version attempt, if need.
-    if ($req_ver =~ /-[^-]+$/) {
-        return $inst_ver;
-    }
-    else {
-        $inst_ver =~ s/-[^-]+$//;
-    }
-
-    return $inst_ver;
 }
 
 
@@ -243,6 +198,7 @@ L<package_is_installed> understands the following syntax:
 =head2 package_isnt_installed($pkg_name [, $test_name ])
 
 Passes if package isn't installed
+
 
 =head1 AUTHOR
 
