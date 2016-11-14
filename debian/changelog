@@ -1,3 +1,9 @@
+libtest-debian-perl (0.07-1) unstable; urgency=medium
+
+  * Tests are passed if use non-debian perl in debian system.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 14 Nov 2016 14:15:14 +0300
+
 libtest-debian-perl (0.06-1) unstable; urgency=medium
 
   * Extends package test syntax.
