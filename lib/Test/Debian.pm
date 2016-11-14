@@ -202,7 +202,7 @@ Passes if package isn't installed
 
 =head1 AUTHOR
 
-Dmitry E. Oboukhov, E<lt>unera@debian.org<gt>
+Dmitry E. Oboukhov, L<unera@debian.org|mailto:unera@debian.org>
 
 =head1 COPYRIGHT AND LICENSE
 
