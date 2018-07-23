@@ -41,8 +41,10 @@ sub _pkg_list($) {
             return 0;
         }
 
-        %dpkg_list = map { ( @$_[0, 1] ) }
-            map { [ split /\s+/, $_, 3 ] } <$fh>;
+        %dpkg_list =
+            map { ( @$_[0, 1] ) }
+            map { s{:\w+$}{} for $_->[0]; $_ }
+            map { [ split m/\s+/, $_, 3 ] } <$fh>;
     }
 
     return \%dpkg_list;
