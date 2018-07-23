@@ -62,7 +62,7 @@ sub package_is_installed($;$) {
         next unless $pkg;
 
         next unless exists $list->{ $pkg };
-        next unless $list->{ $pkg } eq 'install';
+        next unless $list->{ $pkg } eq 'install' || $list->{ $pkg } eq 'hold';
 
         return $tb->ok( 1, $name ) unless $op;
         my $ok = _compare_versions_ok($pkg, $op, $ver);
