@@ -3,7 +3,7 @@ libtest-debian-perl (0.09-1) nowtaxi; urgency=medium
   * Fix hold packages
   * Remove arch from test
 
- -- Roman V. Nikolaev <rshadow@rambler.ru>  Mon, 23 Jul 2018 18:11:07 +0300
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 23 Jul 2018 18:11:07 +0300
 
 libtest-debian-perl (0.08-1) unstable; urgency=medium
 
